@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Meal Calculation</title>
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mealcalapp/for-all/style.css">
+</head>
+<body>
+
+  <!-- Manager & Month -->
+  <div style="display: flex; justify-content: center; gap: 20px; margin-top: 10px;">
+      <label>Manager:
+        <input id="managerInput" type="text" placeholder="Name" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
+      </label>
+      <label>Month:
+        <input type="text" placeholder="Month" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
+      </label>
+      <div id="comparisonResult" style="margin-top:10px; font-weight:bold;"></div> 
+  </div>
+
+  <!-- Table -->
+  <table id="mealTable">
+    <thead>
+      <tr>
+        <th>Serial</th>
+        <th>Name</th>
+        <th>Deposit Tk</th>
+        <th>Meal</th>
+        <th>Meal Rate</th>
+        <th>Meal Cost</th>
+        <th>Additional Cost</th>
+        <th>Total</th>
+        <th class="dueHead">Due</th>
+        <th class="refundHead">Refund</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+ <!-- Notice Box -->
+    <div id="noticeBox" class="shine-btn" style="background-color: green; color: white; padding: 5px; border-radius: 5px; margin-top: -10px; text-align: center; display: flex; justify-content: center; align-items: center;">
+      নভেম্বর মাসের ৫ তারিখের মধ্যে সকল লেনদেন পরিশোধ করবেন, ধন্যবাদ। 
+      <span style="display: flex; align-items: center;">
+        <img src="https://www.logo.wine/a/logo/BKash/BKash-Icon2-Logo.wine.svg" alt="bKash" style="height:30px; vertical-align: middle;">
+        bKash (+charge): 01761561321
+      </span>
+    </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="control-item">
+      <label>Total Members</label>
+      <input type="number" id="memberCount" value="" min="1" oninput="generateTable()">
+    </div>
+    <div class="control-item">
+      <label>Meal</label>
+      <input type="number" id="totalMeal" value="">
+    </div>
+    <div class="control-item">
+      <label>Bazar Cost</label>
+      <input type="number" id="bazarCost" value="">
+    </div>
+    <div class="control-item">
+      <label>Meal Rate</label>
+      <input type="text" id="mealRateBox" readonly>
+    </div>
+    <div class="control-item">
+      <label>Additional</label>
+      <input type="number" id="additionalCost" value="">
+    </div>
+    <div class="control-item">
+      <label>Additional Cost</label>
+      <input type="text" id="addCostRateBox" readonly>
+    </div>
+  </div>
+
+  <div class="controls">
+    <h4 style="color:#333;">Compare with Previous Month 👉</h4>
+    <div class="control-item">
+      <label>Previous Meal Rate:</label>
+      <input type="number" id="prevMealRate" oninput="compareRates()" value="">
+    </div>
+    <div class="control-item">
+      <label>Previous Additional Cost:</label>
+      <input type="number" id="prevAddCostRate" oninput="compareRates()">
+    </div>
+    <!-- Notice Input Section -->
+    <div class="control-item">
+      <label>Notice Control:</label>
+      <input type="text" id="monthInput" placeholder="Next Month" style="padding:5px; border-radius:5px;">
+      <input type="number" id="dateInput" placeholder="Last Date" style="padding:5px; border-radius:5px;">
+      <input type="number" id="bkashInput" placeholder="bKash Account" style="padding:5px; border-radius:5px;"><br>
+      <button onclick="updateNotice()" class="shine-btn" style="padding:5px 10px; color: white; border:none; border-radius:5px;">Update</button>
+    </div>
+  </div>
+  <div class="control-item">
+    <button id="saveBtn" class="shine-btn">Save as CSV</button>
+    <button id="pdfBtn" class="shine-btn">Save as PDF</button>
+  </div>
+
+  <!-- JS Start -->
+  <script src="https://cdn.jsdelivr.net/gh/mealcalapp/for-all/app.js"></script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+
+  <div style="text-align:center; margin-top:20px; font-size:13px; color:#555;">
+    Designed by <a href="https://www.facebook.com/officiall.sk" target="_blank" style="color:#3182ce;font-weight:bold;text-decoration:none;">SK JISAN</a>
+  </div>
+
+</body>
+</html>
