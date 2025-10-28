@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Live Meal Calculation</title>
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mealcalapp/for-all/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mealcalapp/for-all/flip.css">
 </head>
 <body>
 
@@ -39,7 +40,7 @@
   </table>
 
  <!-- Notice Box -->
-    <div id="noticeBox" class="shine-btn" style="background-color: green; color: white; padding: 5px; border-radius: 5px; margin-top: -10px; text-align: center; display: flex; justify-content: center; align-items: center;">
+    <div id="noticeBox" class="shine-bt" style="background-color: green; color: white; padding: 5px; border-radius: 5px; margin-top: -10px; text-align: center; display: flex; justify-content: center; align-items: center;">
       নভেম্বর মাসের ৫ তারিখের মধ্যে সকল লেনদেন পরিশোধ করবেন, ধন্যবাদ। 
       <span style="display: flex; align-items: center;">
         <img src="https://www.logo.wine/a/logo/BKash/BKash-Icon2-Logo.wine.svg" alt="bKash" style="height:30px; vertical-align: middle;">
@@ -94,20 +95,42 @@
       <button onclick="updateNotice()" class="shine-btn" style="padding:5px 10px; color: white; border:none; border-radius:5px;">Update</button>
     </div>
   </div>
-  <div class="control-item">
+  <div class="notice-box mb-2">
+    <marquee id="monthMarquee" style="background-color: green; padding: 5px; border-radius: 5px; margin-top: 5px; color: white;" behavior="scroll"> <!-- text here --> </marquee>
+ </div>
+  <div class="text-center">
+      <div id="flipdownTimer" class="flipdown d-inline-block"></div>
+  </div>
+  <div class="" style="display: flex; gap: 20px; justify-content: center;">
     <button id="saveBtn" class="shine-btn">Save as CSV</button>
     <button id="pdfBtn" class="shine-btn">Save as PDF</button>
   </div>
+  <!-- JS Start -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const marquee = document.getElementById("monthMarquee");
+      const now = new Date();
+      const monthYear = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+      const customText = "Time Left";
+      marquee.textContent = `${monthYear} — ${customText}`;
+    });
+  </script>
 
   <!-- JS Start -->
-  <script src="https://cdn.jsdelivr.net/gh/mealcalapp/for-all/app.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/mealcalapp/for-all@latest/app.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/mealcalapp/for-all/flip.js"></script>
   <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
 
   <div style="text-align:center; margin-top:20px; font-size:13px; color:#555;">
-    Designed by <a href="https://www.facebook.com/officiall.sk" target="_blank" style="color:#3182ce;font-weight:bold;text-decoration:none;">SK JISAN</a>
+    <span style="font-size:18px; vertical-align:middle;">&copy;</span>
+    <a href="https://www.facebook.com/officiall.sk" target="_blank" style="color:green; font-weight:bold; text-decoration:none; margin:0 1px; vertical-align:middle;">SK JISAN</a>
+    <span id="currentYear" style="vertical-align:middle;"></span>
   </div>
+  <script>
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+  </script>
 
 </body>
 </html>
