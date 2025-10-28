@@ -230,19 +230,24 @@ mealTable.addEventListener("input", (e) => {
   doc.save("MealSheet.pdf");
 });
 
-// CSV export
+// CSV Export (Clean & Ordered)
   document.getElementById("saveBtn").addEventListener("click", () => {
     let csv = "";
     const rows = table.querySelectorAll("tr");
-    rows.forEach(row => {
+
+    rows.forEach((row, rowIndex) => {
       const cols = row.querySelectorAll("th, td");
       const values = Array.from(cols).map(col => {
         const input = col.querySelector("input");
-        return input ? input.value : col.textContent.trim();
+        let val = input ? input.value.trim() : col.textContent.trim();
+        if (val.includes(",")) val = `"${val}"`;
+        return val;
       });
+
       csv += values.join(",") + "\n";
     });
-    const blob = new Blob([csv], { type: "text/csv" });
+
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "MealSheet.csv";
