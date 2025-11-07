@@ -110,19 +110,27 @@ const table = document.getElementById("mealTable");
   });
 
 // ===== Manager Star =====
-  const managerInput = document.getElementById("managerInput");
+const managerInput = document.getElementById("managerInput");
 const mealTable = document.getElementById("mealTable");
 
 function updateStars() {
-  const managerName = managerInput.value.trim().toLowerCase();
+  // Split by space, remove empty values
+  const managerNames = managerInput.value
+    .trim()
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
+
   document.querySelectorAll("#mealTable tbody tr").forEach(row => {
     const nameInput = row.cells[1]?.querySelector("input");
     if (!nameInput) return;
+
     const nameText = nameInput.value.trim().toLowerCase();
     let star = row.querySelector(".star");
     if (star) star.remove();
 
-    if (managerName && nameText === managerName) {
+    // Match any of the manager names
+    if (managerNames.includes(nameText)) {
       star = document.createElement("span");
       star.textContent = "★";
       star.className = "star";
@@ -131,7 +139,7 @@ function updateStars() {
   });
 }
 
-// Manager input change
+// Update stars when manager input or table input changes
 managerInput.addEventListener("input", updateStars);
 mealTable.addEventListener("input", (e) => {
   if (e.target.matches("tbody tr td:nth-child(2) input")) {
