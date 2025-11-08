@@ -4,8 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Live Meal Calculation</title>
- <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mealcalapp/for-all/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mealcalapp/for-all/style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mealcalapp/for-all/flip.css">
+  <style>
+    #floatingButton {
+            z-index: 100;
+        }
+  </style>
 </head>
 <body>
 
@@ -105,6 +110,23 @@
     <button id="saveBtn" class="shine-btn">Save as CSV</button>
     <button id="pdfBtn" class="shine-btn">Save as PDF</button>
   </div>
+  <!-- Floating Button -->
+  <button id="floatingButton"
+            class="fixed 
+                   bottom-4 right-1 
+                   p-3 text-l   
+                   bg-green-700 hover:bg-green-800 
+                   text-white 
+                   rounded-full shadow-2xl 
+                   transition duration-300 
+                   transform hover:scale-105 
+                   flex items-center space-x-2 
+                   ring-4 ring-green-300 ring-opacity-50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+        </svg>
+        <span class="hidden md:inline" style="">Meal Register</span>
+    </button>
   <!-- JS Start -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -412,13 +434,23 @@ function updateNotice() {
   buttons.forEach(btn => {
     function triggerShine() {
       btn.classList.remove("animate");
-      void btn.offsetWidth; // restart animation
+      void btn.offsetWidth; 
       btn.classList.add("animate");
     }
 
     btn.addEventListener("mouseenter", triggerShine);
     btn.addEventListener("click", triggerShine);
   });
+
+ // Floating Button
+    document.addEventListener('DOMContentLoaded', () => {
+        const fab = document.getElementById('floatingButton');
+        if (fab) {
+            fab.addEventListener('click', () => {
+                window.open('https://mealcalapp.github.io/for-meal/', '_blank');
+            });
+        }
+      });
   </script>
   <script src="https://cdn.jsdelivr.net/gh/mealcalapp/for-all/flip.js"></script>
   <!-- jsPDF -->
