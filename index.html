@@ -15,7 +15,7 @@
         <input id="managerInput" type="text" placeholder="Name" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
       </label>
       <label>Month:
-        <input type="text" placeholder="Month" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
+        <input id="autoMonth" type="text" placeholder="" style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
       </label>
       <div id="comparisonResult" style="margin-top:10px; font-weight:bold;"></div> 
   </div>
@@ -115,6 +115,15 @@
       marquee.textContent = `${monthYear} — ${customText}`;
     });
   </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const monthInput = document.getElementById("autoMonth");
+      const now = new Date();
+      const monthYear = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+      monthInput.value = monthYear;
+      monthInput.readOnly = true; 
+    });
+   </script>
 
   <!-- JS Start -->
   <script>
