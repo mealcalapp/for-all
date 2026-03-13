@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -131,6 +132,72 @@
   <!-- JS Start -->
   <script>
     const table = document.getElementById("mealTable");
+    const STORAGE_KEY = "mealRegData";
+
+  function saveState() {
+    const rows = Array.from(table.querySelectorAll("tbody tr")).map(row => ({
+      name: row.cells[1].querySelector("input").value,
+      deposit: row.cells[2].querySelector("input").value,
+      meal: row.cells[3].querySelector("input").value,
+      rate: row.cells[4].querySelector("input").value,
+      addCost: row.cells[6].querySelector("input").value
+    }));
+
+    const state = {
+      managerInput: document.getElementById("managerInput").value,
+      autoMonth: document.getElementById("autoMonth").value,
+      memberCount: document.getElementById("memberCount").value,
+      totalMeal: document.getElementById("totalMeal").value,
+      bazarCost: document.getElementById("bazarCost").value,
+      additionalCost: document.getElementById("additionalCost").value,
+      prevMealRate: document.getElementById("prevMealRate").value,
+      prevAddCostRate: document.getElementById("prevAddCostRate").value,
+      monthInput: document.getElementById("monthInput").value,
+      dateInput: document.getElementById("dateInput").value,
+      bkashInput: document.getElementById("bkashInput").value,
+      rows
+    };
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function loadState() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return false;
+
+    const state = JSON.parse(saved);
+    document.getElementById("managerInput").value = state.managerInput || "";
+    document.getElementById("autoMonth").value = state.autoMonth || document.getElementById("autoMonth").value;
+    document.getElementById("memberCount").value = state.memberCount || "";
+    document.getElementById("totalMeal").value = state.totalMeal || "";
+    document.getElementById("bazarCost").value = state.bazarCost || "";
+    document.getElementById("additionalCost").value = state.additionalCost || "";
+    document.getElementById("prevMealRate").value = state.prevMealRate || "";
+    document.getElementById("prevAddCostRate").value = state.prevAddCostRate || "";
+    document.getElementById("monthInput").value = state.monthInput || "";
+    document.getElementById("dateInput").value = state.dateInput || "";
+    document.getElementById("bkashInput").value = state.bkashInput || "";
+
+    generateTable();
+
+    (state.rows || []).forEach((savedRow, index) => {
+      const row = table.querySelectorAll("tbody tr")[index];
+      if (!row) return;
+
+      row.cells[1].querySelector("input").value = savedRow.name || "";
+      row.cells[2].querySelector("input").value = savedRow.deposit || "";
+      row.cells[3].querySelector("input").value = savedRow.meal || "";
+      row.cells[4].querySelector("input").value = savedRow.rate || "";
+      row.cells[6].querySelector("input").value = savedRow.addCost || "";
+    });
+
+    updateTable();
+    updateStars();
+    compareRates();
+    updateNotice();
+    saveState();
+    return true;
+  }
 
   // ===== Table Generator =====
   function generateTable() {
@@ -157,6 +224,7 @@
       tbody.appendChild(row);
     }
     updateRates();
+    saveState();
   }
 
   // ===== Calculation =====
@@ -199,6 +267,7 @@
     // Update Due & Refund headers
     document.querySelector(".dueHead").innerHTML = `Due: ${totalDue.toFixed(0)}`;
     document.querySelector(".refundHead").innerHTML = `Refund: ${totalRefund.toFixed(0)}`;
+    saveState();
   }
 
   // Bottom controller elements
@@ -238,6 +307,9 @@
     if (e.target.tagName === "INPUT") {
       if (["totalMeal", "bazarCost", "additionalCost"].includes(e.target.id)) updateRates();
       else updateTable();
+      if (["prevMealRate", "prevAddCostRate"].includes(e.target.id)) compareRates();
+      if (["monthInput", "dateInput", "bkashInput"].includes(e.target.id)) updateNotice();
+      saveState();
     }
   });
 
@@ -300,6 +372,7 @@ mealTable.addEventListener("input", (e) => {
     }
 
     document.getElementById("comparisonResult").innerHTML = mealChange + "<br>" + addChange;
+    saveState();
   }
 
   function getChangeText(label, diff, prevValue) {
@@ -394,7 +467,9 @@ mealTable.addEventListener("input", (e) => {
     link.click();
   });
 
-  generateTable();
+  if (!loadState()) {
+    generateTable();
+  }
  
   // Notice
 function updateNotice() {
@@ -409,6 +484,7 @@ function updateNotice() {
       bKash (+charge): ${bkash}
     </span>
   `;
+  saveState();
 }
 // Button Animation
   const buttons = document.querySelectorAll(".shine-btn");
