@@ -105,7 +105,9 @@
     </div>
   </div>
   <div class="notice-box mb-2">
-    <marquee id="monthMarquee" style="color: green;padding: 5px;border-radius: 5px;border:1px solid green;margin-top: 5px;" behavior="scroll"><!-- Text will appear here --></marquee>
+    <div class="marquee-container">
+      <div id="monthMarquee" class="marquee-text"></div>
+    </div>
   </div>
   <div class="text-center">
       <div id="flipdownTimer" class="flipdown d-inline-block"></div>
@@ -119,12 +121,12 @@
   <!-- JS Start -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const marquee = document.getElementById("monthMarquee");
-      const now = new Date();
-      const monthYear = now.toLocaleString('default', { month: 'long', year: 'numeric' });
-      const customText = "Time Left";
-      marquee.textContent = `${monthYear} — ${customText}`;
-    });
+    const marquee = document.getElementById("monthMarquee");
+    const now = new Date();
+    const monthYear = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+    const customText = "Time Left";
+    marquee.textContent = `${monthYear} — ${customText}`;
+  });
   </script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
