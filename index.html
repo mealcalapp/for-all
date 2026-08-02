@@ -358,11 +358,11 @@ const managerInput = document.getElementById("managerInput");
 const mealTable = document.getElementById("mealTable");
 
 function updateStars() {
-  // Split by space, remove empty values
-  const managerNames = managerInput.value
-    .trim()
-    .toLowerCase()
-    .split(/\s+/)
+  const managerText = managerInput.value.trim().toLowerCase();
+
+  const managerNames = managerText
+    .split(/[,|\n]+/)
+    .map(name => name.trim())
     .filter(Boolean);
 
   document.querySelectorAll("#mealTable tbody tr").forEach(row => {
@@ -373,8 +373,12 @@ function updateStars() {
     let star = row.querySelector(".star");
     if (star) star.remove();
 
-    // Match any of the manager names
-    if (managerNames.includes(nameText)) {
+    const isMatch =
+      managerNames.includes(nameText) ||
+      managerText === nameText ||
+      managerText.split(/\s+/).includes(nameText);
+
+    if (isMatch) {
       star = document.createElement("span");
       star.textContent = "★";
       star.className = "star";
@@ -382,14 +386,6 @@ function updateStars() {
     }
   });
 }
-
-// Update stars when manager input or table input changes
-managerInput.addEventListener("input", updateStars);
-mealTable.addEventListener("input", (e) => {
-  if (e.target.matches("tbody tr td:nth-child(2) input")) {
-    updateStars();
-  }
-});
 
 // Comparison Part 
   function compareRates() {
@@ -667,11 +663,12 @@ function applyMealRegisterData(data, monthKey) {
 
   document.getElementById("totalMeal").value = totalMealCount || "";
 
-  updateRates();
-  updateStars();
-  compareRates();
+    updateRates();
+    requestAnimationFrame(() => {
+    updateStars();
+    compareRates();
+  });
 }
-
 const syncedMonthKey = getMonthFromUrl();
 
 mealRegisterDb.ref(`meal_register/${syncedMonthKey}`).on("value", snapshot => {
