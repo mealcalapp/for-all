@@ -366,7 +366,8 @@ function updateStars() {
     .filter(Boolean);
 
   document.querySelectorAll("#mealTable tbody tr").forEach(row => {
-    const nameInput = row.cells[1]?.querySelector("input");
+    const nameCell = row.cells[1];
+    const nameInput = nameCell?.querySelector("input");
     if (!nameInput) return;
 
     const nameText = nameInput.value.trim().toLowerCase();
@@ -378,10 +379,22 @@ function updateStars() {
       managerText === nameText ||
       managerText.split(/\s+/).includes(nameText);
 
+    nameCell.style.whiteSpace = "nowrap";
+    nameCell.style.textAlign = "center";
+
+    nameInput.style.width = "135px";
+    nameInput.style.display = "inline-block";
+    nameInput.style.verticalAlign = "middle";
+
     if (isMatch) {
       star = document.createElement("span");
-      star.textContent = "★";
+      star.textContent = " ⭐";
       star.className = "star";
+      star.style.display = "inline-block";
+      star.style.marginLeft = "4px";
+      star.style.verticalAlign = "middle";
+      star.style.fontSize = "16px";
+      star.style.lineHeight = "1";
       nameInput.insertAdjacentElement("afterend", star);
     }
   });
