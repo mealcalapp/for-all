@@ -540,8 +540,9 @@ function updateNotice() {
   });
   </script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-  <script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+
+<script>
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBCL4AUrRQ0puDGCY5cjajzuIfAbTNx4i8",
   authDomain: "meal-register.firebaseapp.com",
@@ -567,6 +568,20 @@ function getMonthFromUrl() {
 function parseNumber(value) {
   const n = parseFloat(value);
   return Number.isFinite(n) && n >= 0 ? n : 0;
+}
+
+function normalizeDeposits(deposits, count) {
+  return Array.from({ length: count }, (_, index) => {
+    if (Array.isArray(deposits)) {
+      return parseNumber(deposits[index]);
+    }
+
+    if (deposits && typeof deposits === "object") {
+      return parseNumber(deposits[index] ?? deposits[String(index)]);
+    }
+
+    return 0;
+  });
 }
 
 function sumDays(values, daysInMonth) {
@@ -612,11 +627,12 @@ function sumCostText(text) {
 
 function applyMealRegisterData(data, monthKey) {
   const members = Array.isArray(data.members) ? data.members : [];
-  const deposits = Array.isArray(data.deposits) ? data.deposits : [];
   const fixedMeal = parseNumber(data.fixedMeal || 0);
   const daysInMonth = getDaysInMonth(monthKey);
 
   const totalMembers = Number(data.memberCount) || members.length || 0;
+  const deposits = normalizeDeposits(data.deposits, totalMembers);
+
   const totalBazarCost = sumCostText(data.bazarCost);
   const totalAdditionalCost = sumCostText(data.note);
 
@@ -640,10 +656,12 @@ function applyMealRegisterData(data, monthKey) {
     if (!row) return;
 
     const meal = getBillingMeal(member, fixedMeal, daysInMonth);
+    const deposit = deposits[index];
+
     totalMealCount += meal;
 
     row.cells[1].querySelector("input").value = member.name || "";
-    row.cells[2].querySelector("input").value = deposits[index] || "";
+    row.cells[2].querySelector("input").value = deposit || "";
     row.cells[3].querySelector("input").value = meal || "";
   });
 
