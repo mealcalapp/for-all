@@ -172,72 +172,45 @@
   <!-- JS Start -->
   <script>
     const table = document.getElementById("mealTable");
-    const STORAGE_KEY = "mealRegData";
+    const CALCULATOR_SYNC_KEY = "mealCalculatorSyncData";
 
-  function saveState() {
-    const rows = Array.from(table.querySelectorAll("tbody tr")).map(row => ({
-      name: row.cells[1].querySelector("input").value,
-      deposit: row.cells[2].querySelector("input").value,
-      meal: row.cells[3].querySelector("input").value,
-      rate: row.cells[4].querySelector("input").value,
-      addCost: row.cells[6].querySelector("input").value
-    }));
+  function applySyncPayload(payload) {
+    if (!payload) return;
 
-    const state = {
-      managerInput: document.getElementById("managerInput").value,
-      autoMonth: document.getElementById("autoMonth").value,
-      memberCount: document.getElementById("memberCount").value,
-      totalMeal: document.getElementById("totalMeal").value,
-      bazarCost: document.getElementById("bazarCost").value,
-      additionalCost: document.getElementById("additionalCost").value,
-      prevMealRate: document.getElementById("prevMealRate").value,
-      prevAddCostRate: document.getElementById("prevAddCostRate").value,
-      monthInput: document.getElementById("monthInput").value,
-      dateInput: document.getElementById("dateInput").value,
-      bkashInput: document.getElementById("bkashInput").value,
-      rows
-    };
+    const bazar = parseFloat(payload.bazar ?? payload.bazarCost ?? 0) || 0;
+    const additional = parseFloat(payload.additional ?? payload.additionalCost ?? 0) || 0;
+    const month = payload.month || "";
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }
+    const bazarInput = document.getElementById("bazarCost");
+    const additionalInput = document.getElementById("additionalCost");
+    const monthInput = document.getElementById("autoMonth");
 
-  function loadState() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return false;
+    if (bazarInput) bazarInput.value = String(bazar);
+    if (additionalInput) additionalInput.value = String(additional);
+    if (monthInput && month) monthInput.value = month;
 
-    const state = JSON.parse(saved);
-    document.getElementById("managerInput").value = state.managerInput || "";
-    document.getElementById("autoMonth").value = state.autoMonth || document.getElementById("autoMonth").value;
-    document.getElementById("memberCount").value = state.memberCount || "";
-    document.getElementById("totalMeal").value = state.totalMeal || "";
-    document.getElementById("bazarCost").value = state.bazarCost || "";
-    document.getElementById("additionalCost").value = state.additionalCost || "";
-    document.getElementById("prevMealRate").value = state.prevMealRate || "";
-    document.getElementById("prevAddCostRate").value = state.prevAddCostRate || "";
-    document.getElementById("monthInput").value = state.monthInput || "";
-    document.getElementById("dateInput").value = state.dateInput || "";
-    document.getElementById("bkashInput").value = state.bkashInput || "";
-
-    generateTable();
-
-    (state.rows || []).forEach((savedRow, index) => {
-      const row = table.querySelectorAll("tbody tr")[index];
-      if (!row) return;
-
-      row.cells[1].querySelector("input").value = savedRow.name || "";
-      row.cells[2].querySelector("input").value = savedRow.deposit || "";
-      row.cells[3].querySelector("input").value = savedRow.meal || "";
-      row.cells[4].querySelector("input").value = savedRow.rate || "";
-      row.cells[6].querySelector("input").value = savedRow.addCost || "";
-    });
-
-    updateTable();
-    updateStars();
+    updateRates();
     compareRates();
     updateNotice();
-    saveState();
-    return true;
   }
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("bazar") || params.get("additional")) {
+    applySyncPayload({
+      bazar: params.get("bazar"),
+      additional: params.get("additional"),
+      month: params.get("month")
+    });
+  }
+
+  window.addEventListener("storage", (event) => {
+    if (event.key !== CALCULATOR_SYNC_KEY) return;
+    try {
+      applySyncPayload(JSON.parse(event.newValue || "{}"));
+    } catch (error) {
+      console.warn("Calculator sync failed", error);
+    }
+  });
 
   // ===== Table Generator =====
   function generateTable() {
@@ -264,7 +237,6 @@
       tbody.appendChild(row);
     }
     updateRates();
-    saveState();
   }
 
   // ===== Calculation =====
@@ -307,7 +279,7 @@
     // Update Due & Refund headers
     document.querySelector(".dueHead").innerHTML = `Due: ${totalDue.toFixed(0)}`;
     document.querySelector(".refundHead").innerHTML = `Refund: ${totalRefund.toFixed(0)}`;
-    saveState();
+
   }
 
   // Bottom controller elements
@@ -349,7 +321,6 @@
       else updateTable();
       if (["prevMealRate", "prevAddCostRate"].includes(e.target.id)) compareRates();
       if (["monthInput", "dateInput", "bkashInput"].includes(e.target.id)) updateNotice();
-      saveState();
     }
   });
 
@@ -421,7 +392,6 @@ function updateStars() {
     }
 
     document.getElementById("comparisonResult").innerHTML = mealChange + "<br>" + addChange;
-    saveState();
   }
 
   function getChangeText(label, diff, prevValue) {
@@ -516,9 +486,7 @@ function updateStars() {
     link.click();
   });
 
-  if (!loadState()) {
-    generateTable();
-  }
+  generateTable();
  
   // Notice
 function updateNotice() {
@@ -533,7 +501,6 @@ function updateNotice() {
       bKash (+charge): ${bkash}
     </span>
   `;
-  saveState();
 }
 // Button Animation
   const buttons = document.querySelectorAll(".shine-btn");

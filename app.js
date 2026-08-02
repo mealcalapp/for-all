@@ -1,4 +1,43 @@
 const table = document.getElementById("mealTable");
+const CALCULATOR_SYNC_KEY = "mealCalculatorSyncData";
+
+function applySyncPayload(payload) {
+  if (!payload) return;
+
+  const bazar = parseFloat(payload.bazar ?? payload.bazarCost ?? 0) || 0;
+  const additional = parseFloat(payload.additional ?? payload.additionalCost ?? 0) || 0;
+  const month = payload.month || "";
+
+  const bazarInput = document.getElementById("bazarCost");
+  const additionalInput = document.getElementById("additionalCost");
+  const monthInput = document.getElementById("autoMonth");
+
+  if (bazarInput) bazarInput.value = String(bazar);
+  if (additionalInput) additionalInput.value = String(additional);
+  if (monthInput && month) monthInput.value = month;
+
+  updateRates();
+  compareRates();
+  updateNotice();
+}
+
+const params = new URLSearchParams(window.location.search);
+if (params.get("bazar") || params.get("additional")) {
+  applySyncPayload({
+    bazar: params.get("bazar"),
+    additional: params.get("additional"),
+    month: params.get("month")
+  });
+}
+
+window.addEventListener("storage", (event) => {
+  if (event.key !== CALCULATOR_SYNC_KEY) return;
+  try {
+    applySyncPayload(JSON.parse(event.newValue || "{}"));
+  } catch (error) {
+    console.warn("Calculator sync failed", error);
+  }
+});
 
   // ===== Table Generator =====
   function generateTable() {
