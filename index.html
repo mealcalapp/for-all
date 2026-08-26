@@ -259,6 +259,41 @@
   const additionalCost = document.getElementById("additionalCost");
   const addCostRateBox = document.getElementById("addCostRateBox");
 
+  // ===== Auto Carry-Over: This Month's Rate -> Next Month's Previous Rate (Firebase) =====
+  // NOTE: mealRegisterDb / syncedMonthKey are defined later in this same page (Firebase script
+  // block below), but since these functions only READ those identifiers when they are actually
+  // CALLED (not when defined), and all <script> tags run before any user interaction or the
+  // on-load calls at the bottom of the Firebase block, they are guaranteed to exist by then.
+
+  function getPrevMonthKeyFromKey(monthKey) {
+    const [y, m] = monthKey.split("-").map(Number);
+    const d = new Date(y, m - 2, 1); // m-1 = current month index (0-based), -1 more = previous month
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  }
+
+  function saveCurrentRatesLive() {
+    if (typeof mealRegisterDb === "undefined" || typeof syncedMonthKey === "undefined") return;
+    const mealRate = parseFloat(mealRateBox.value) || 0;
+    const addRate = parseFloat(addCostRateBox.value) || 0;
+    mealRegisterDb.ref(`meal_rates/${syncedMonthKey}`).set({ mealRate, addRate });
+  }
+
+  function loadPrevRatesFromLastMonth() {
+    if (typeof mealRegisterDb === "undefined" || typeof syncedMonthKey === "undefined") return;
+    const prevMonthKey = getPrevMonthKeyFromKey(syncedMonthKey);
+    mealRegisterDb.ref(`meal_rates/${prevMonthKey}`).once("value").then(snapshot => {
+      const data = snapshot.val();
+      if (!data) return;
+      const prevMealRateInput = document.getElementById("prevMealRate");
+      const prevAddCostRateInput = document.getElementById("prevAddCostRate");
+      if (prevMealRateInput && !prevMealRateInput.value) prevMealRateInput.value = data.mealRate || "";
+      if (prevAddCostRateInput && !prevAddCostRateInput.value) prevAddCostRateInput.value = data.addRate || "";
+      compareRates();
+    }).catch(() => {
+      /* ignore read errors, e.g. offline */
+    });
+  }
+
   function updateRates() {
     const meal = parseFloat(totalMeal.value) || 0;
     const bazar = parseFloat(bazarCost.value) || 0;
@@ -283,6 +318,7 @@
       row.cells[6].querySelector("input").value = addRate.toFixed();
     });
     updateTable();
+    saveCurrentRatesLive();
   }
 
   document.addEventListener("input", e => {
@@ -635,6 +671,8 @@ mealRegisterDb.ref(`meal_register/${syncedMonthKey}`).on("value", snapshot => {
 
   applyMealRegisterData(data, syncedMonthKey);
 });
+
+loadPrevRatesFromLastMonth();
 </script>
   <script src="https://cdn.jsdelivr.net/gh/mealcalapp/for-all/flip.js"></script>
   <!-- jsPDF -->
