@@ -587,13 +587,21 @@ function getDaysInMonth(monthKey) {
   return new Date(year, month, 0).getDate();
 }
 
+function getEffectiveFixedMeal(member, fixedMeal) {
+  const custom = member.customFixedMeal;
+  return (typeof custom === "number" && Number.isFinite(custom) && custom >= 0)
+    ? custom
+    : fixedMeal;
+}
+
 function getBillingMeal(member, fixedMeal, daysInMonth) {
   const realMeal = sumDays(member.meals, daysInMonth);
   const guestMeal = sumDays(member.guestMeals, daysInMonth);
   const fixedMealOff = Boolean(member.fixedMealOff);
+  const effectiveFixedMeal = getEffectiveFixedMeal(member, fixedMeal);
 
   const billedMeal = realMeal > 0 && !fixedMealOff
-    ? Math.max(realMeal, fixedMeal)
+    ? Math.max(realMeal, effectiveFixedMeal)
     : realMeal;
 
   return billedMeal + guestMeal;
